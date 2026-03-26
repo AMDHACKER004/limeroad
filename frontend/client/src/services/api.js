@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "baseURL: "https://limeroad-isdv.onrender.com/api",
+  baseURL: "https://limeroad-isdv.onrender.com/api",
 });
 
 // 🔥 Automatically attach token to every request
