@@ -1,4 +1,8 @@
 # 🛍️ Limeroad Clone (Full Stack E-commerce)
+live project admin side
+limeroad-n7ba.vercel.app
+client
+https://limeroad-tau.vercel.app/
 
 A full-stack e-commerce web application with client, admin panel, and backend.
 
