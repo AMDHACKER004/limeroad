@@ -1,0 +1,45 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #f9fafb; /* light gray like real dashboards */
+  color: #111827;
+}
+
+/* Remove Vite demo root styling */
+#root {
+  min-height: 100vh;
+}
+
+/* Utility for links */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* Inputs */
+input, select, textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+/* Scrollbar clean look */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
