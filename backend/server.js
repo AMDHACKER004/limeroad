@@ -76,7 +76,8 @@
 //   console.log(`🚀 Server running on http://localhost:${PORT}`);
 // });
 
-```javascript
+
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -92,22 +93,20 @@ import userRoutes from "./routes/user.routes.js";
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // ---------------- CORS CONFIG ----------------
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-
-  // Live customer frontend
   "https://limeroad-tau.vercel.app",
-
-  // Add your admin panel's exact Vercel URL here
+  "https://limeroad-1nz1i9w4u-amdhacker004s-projects.vercel.app",
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests from Postman and server-to-server clients
+      // Allow requests without an Origin header (e.g. Postman)
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -129,7 +128,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// ---------------- ROUTES ----------------
+// ---------------- API ROUTES ----------------
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
@@ -146,27 +145,31 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("🔥 Error:", err.message);
 
+  if (res.headersSent) {
+    return next(err);
+  }
+
   res.status(err.statusCode || 500).json({
     message: err.message || "Something went wrong",
   });
 });
 
 // ---------------- START SERVER ----------------
-const PORT = process.env.PORT || 5000;
-
 async function startServer() {
   try {
-    // Wait for the database connection before accepting requests
     await connectDB();
 
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error("❌ Failed to start server:", error.message);
+    console.error("❌ Failed to start server:", error);
     process.exit(1);
   }
 }
 
 startServer();
-```
+
+
+
+
