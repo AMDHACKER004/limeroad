@@ -23,6 +23,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://limeroad-tau.vercel.app",
+  "https://limeroad-n7ba.vercel.app",
 ];
 
 app.use(
