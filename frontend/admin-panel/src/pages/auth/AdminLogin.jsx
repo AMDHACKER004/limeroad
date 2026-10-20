@@ -1,7 +1,9 @@
+```jsx
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+import { BASE_URL } from "../../utils/constants";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -16,7 +18,12 @@ const AdminLogin = () => {
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -26,14 +33,40 @@ const AdminLogin = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/admin/login",
-        formData
+        `${BASE_URL}/auth/admin/login`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 20000,
+        }
       );
 
+      if (!res.data?.token || !res.data?.user) {
+        throw new Error("Invalid login response from server");
+      }
+
       login(res.data);
-      navigate("/admin/dashboard");
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      console.error(
+        "Admin login error:",
+        err.response?.data || err.message
+      );
+
+      if (err.response) {
+        setError(
+          err.response.data?.message ||
+            `Login failed (HTTP ${err.response.status})`
+        );
+      } else if (err.code === "ECONNABORTED") {
+        setError("Server response timed out. Please try again.");
+      } else {
+        setError(
+          "Cannot connect to the server. Please try again later."
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -43,39 +76,45 @@ const AdminLogin = () => {
     <>
       <div className="login-wrapper">
         <div className="login-card">
-          
-          {/* Branding */}
           <div className="login-header">
             <h1>LimeRoad Admin</h1>
             <p>Login to manage dashboard</p>
           </div>
 
-          {/* Error */}
-          {error && <div className="error-box">{error}</div>}
+          {error && (
+            <div className="error-box" role="alert">
+              {error}
+            </div>
+          )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <label>Email</label>
+              <label htmlFor="admin-email">Email</label>
               <input
+                id="admin-email"
                 type="email"
                 name="email"
+                autoComplete="username"
                 required
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="admin@example.com"
+                disabled={loading}
               />
             </div>
 
             <div className="input-group">
-              <label>Password</label>
+              <label htmlFor="admin-password">Password</label>
               <input
+                id="admin-password"
                 type="password"
                 name="password"
+                autoComplete="current-password"
                 required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="••••••"
+                placeholder="Enter your password"
+                disabled={loading}
               />
             </div>
 
@@ -84,11 +123,12 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          <p className="footer-text">© 2026 LimeRoad Admin Panel</p>
+          <p className="footer-text">
+            © 2026 LimeRoad Admin Panel
+          </p>
         </div>
       </div>
 
-      {/* INLINE CSS */}
       <style>{`
         body {
           background: #f6f7fb;
@@ -101,11 +141,13 @@ const AdminLogin = () => {
           justify-content: center;
           align-items: center;
           padding: 20px;
+          box-sizing: border-box;
         }
 
         .login-card {
           width: 100%;
           max-width: 400px;
+          box-sizing: border-box;
           background: #ffffff;
           padding: 40px 30px;
           border-radius: 20px;
@@ -120,7 +162,7 @@ const AdminLogin = () => {
         .login-header h1 {
           font-size: 28px;
           color: #00bfa5;
-          margin-bottom: 5px;
+          margin: 0 0 5px;
         }
 
         .login-header p {
@@ -131,10 +173,11 @@ const AdminLogin = () => {
         .error-box {
           background: #ffecec;
           color: #d63031;
-          padding: 10px;
+          padding: 12px;
           border-radius: 10px;
           font-size: 14px;
-          margin-bottom: 15px;
+          margin-bottom: 18px;
+          overflow-wrap: anywhere;
         }
 
         .input-group {
@@ -151,6 +194,8 @@ const AdminLogin = () => {
         }
 
         .input-group input {
+          width: 100%;
+          box-sizing: border-box;
           padding: 12px 14px;
           border-radius: 10px;
           border: 1px solid #ddd;
@@ -162,7 +207,7 @@ const AdminLogin = () => {
           border-color: #00bfa5;
         }
 
-        button {
+        .login-card button {
           width: 100%;
           background: #00bfa5;
           border: none;
@@ -172,14 +217,14 @@ const AdminLogin = () => {
           font-weight: 600;
           border-radius: 12px;
           cursor: pointer;
-          transition: 0.2s;
+          transition: opacity 0.2s;
         }
 
-        button:hover {
+        .login-card button:hover {
           opacity: 0.9;
         }
 
-        button:disabled {
+        .login-card button:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
@@ -190,9 +235,16 @@ const AdminLogin = () => {
           color: #aaa;
           margin-top: 25px;
         }
+
+        @media (max-width: 480px) {
+          .login-card {
+            padding: 30px 22px;
+          }
+        }
       `}</style>
     </>
   );
 };
 
 export default AdminLogin;
+```
