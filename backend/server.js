@@ -18,21 +18,21 @@ connectDB();
 const app = express();
 
 // ---------------- CORS CONFIG (FIXED FOR BOTH FRONTENDS) ----------------
+
 const allowedOrigins = [
-  "http://localhost:5173", // user frontend
-  "http://localhost:5174", // admin panel
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://limeroad-tau.vercel.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests like Postman (no origin)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
+      console.error("🔥 CORS blocked origin:", origin);
       return callback(new Error("CORS not allowed"));
     },
     credentials: true,
